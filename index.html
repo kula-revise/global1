@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The World Gets Smaller | A New Global World Order: Globalisation | Kula Revise</title>
+<style>
+  /* ============================================================
+     KULA SOURCE ENGINE v3: TOKEN CONTRACT
+     This file is fixed mechanism. Do not edit it per series.
+     A skin sets the THIRTEEN identity variables in the block below
+     and nothing else is required of it.
+
+     Two accents, split by job:
+       --a1  accent one: navigation, progress, emphasis, option letters,
+             the primary button, the story date. The "structure" accent.
+       --a2  accent two: anything the learner earned. Correct answers,
+             the running summary, breakdown bars, key facts, the last
+             story line. The "reward" accent.
+     Set --a1-rgb / --a2-rgb to the SAME colours as r,g,b (no #), because
+     the tints, washes and shadows are built from them.
+     ============================================================ */
+
+  :root {
+    /* ---- THE IDENTITY CONTRACT. A skin overrides these thirteen. ---- */
+    --sand:  #F2E9D9;   /* page background */
+    --paper: #FBF6EB;   /* cards */
+    --cut:   #FFFCF4;   /* insets, sources, carousels */
+    --ink:   #1B2A33;   /* body text */
+    --clay:  #8C4A2F;   /* stage tags, quiet labels */
+    --fade:  #7B7263;   /* muted text, captions */
+    --a1: #B4622D;   --a1-rgb: 180,98,45;
+    --a2: #1F6B58;   --a2-rgb: 31,107,88;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans:  system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --mono:  var(--sans);
+
+    /* ---- DERIVED TOKENS. A skin should not need to touch these. ----
+       They exist because the engine used to hardcode fourteen literal
+       colours, which is what made every glossary definition and every
+       source expander invisible in dark mode. Everything below now
+       tracks the identity variables above, so a skin that sets --fade
+       and --ink correctly gets a readable dark mode for free. ---- */
+    --muted:      var(--fade);          /* secondary body text: kt-def, toggle-body, disc-body, cover-line */
+    --hair:       rgba(0,0,0,0.12);     /* progress track, quiet rules */
+    --hair-strong:rgba(0,0,0,0.28);     /* dashed divider inside an expander */
+    --on-ink:     var(--paper);         /* text sitting on an --ink ground */
+    --on-a1:      var(--paper);         /* text sitting on an --a1 ground */
+    --on-a2:      var(--paper);         /* text sitting on an --a2 ground */
+    --ink-deep:   #12202a;              /* --ink one step darker, button hover */
+    --a2-deep:    #164C3F;              /* --a2 one step darker, button hover */
+    --ok-bg:      rgba(var(--a2-rgb),0.13);  /* a correct option, a placed item */
+    --no-bg:      rgba(140,74,47,0.13);      /* a wrong option, a misplaced item */
+    /* Skill chips. a = the entry-level skill (Extract, Argue, Evidence, Recall).
+       b = the middle skill (Interpret, Understand). c = unassessed instinct.
+       The top skill (Evaluate, Weigh, Apply) sits on a solid accent ground. */
+    --chip-a-bg: rgba(var(--a1-rgb),0.16);  --chip-a-fg: var(--a1);
+    --chip-b-bg: rgba(var(--a2-rgb),0.16);  --chip-b-fg: var(--a2);
+    --chip-c-bg: rgba(0,0,0,0.06);
+    --scrim:  rgba(27,42,51,0.5);       /* modal backdrop */
+    --inset:  rgba(255,255,255,0.4);    /* sort column well */
+
+    /* Legacy aliases. Older skins and the quiz shell reference these. */
+    --copper: var(--a1);
+    --malachite: var(--a2);
+  }
+
+  /* ---- DARK MODE TOKEN RE-POINT ---------------------------------------
+     The skin supplies body.alt values for the thirteen identity variables.
+     Everything derived re-points here, once, for every unit. This is the
+     engine-level fix for the three defects logged in MOBILE_FIXES_HANDOVER:
+     a skin no longer needs the patch block at all.
+     ------------------------------------------------------------------- */
+  body.alt {
+    --muted:      var(--fade);
+    --hair:       rgba(255,255,255,0.14);
+    --hair-strong:rgba(255,255,255,0.26);
+    --on-ink:     var(--sand);
+    --on-a1:      var(--sand);
+    --on-a2:      var(--sand);
+    --ink-deep:   var(--ink);
+    --a2-deep:    var(--a2);
+    --ok-bg:      rgba(var(--a2-rgb),0.20);
+    --no-bg:      rgba(var(--a1-rgb),0.18);
+    --chip-a-bg:  rgba(var(--a1-rgb),0.22);  --chip-a-fg: var(--ink);
+    --chip-b-bg:  rgba(var(--a2-rgb),0.22);  --chip-b-fg: var(--ink);
+    --chip-c-bg:  rgba(255,255,255,0.10);
+    --scrim:  rgba(0,0,0,0.62);
+    --inset:  rgba(255,255,255,0.05);
+  }
+  /* Key term chips keep a visible edge once the ground inverts. */
+  body.alt .kt-term { border-color: var(--hair-strong); }
+  body.alt .kt-term summary { color: var(--ink); }
+  body.alt .kt-label { border-top-color: var(--hair-strong); }
+  /* v2 dimmed the options a learner did not pick; at 0.45 they vanish on a dark ground. */
+  body.alt .option.dimmed, body.alt .option-btn.dimmed { opacity: 0.72; }
+
+  /* ---- MODE TOGGLE. Fixed bottom right, 44px minimum tap target. ---- */
+  .mode-toggle {
+    position: fixed; bottom: 0.9rem; right: 0.9rem; z-index: 40;
+    display: flex; align-items: center; gap: 0.4rem;
+    font-family: var(--sans); font-size: 0.66rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 0.62rem 0.75rem; min-height: 44px;
+    background: var(--paper); color: var(--fade);
+    border: 1px solid var(--hair-strong); cursor: pointer;
+    box-shadow: 0 2px 12px var(--scrim);
+  }
+  .mode-toggle:hover { color: var(--ink); border-color: var(--a1); }
+  .mode-toggle:focus-visible { outline: 2px solid var(--a1); outline-offset: 2px; }
+  .mode-toggle svg { width: 0.9rem; height: 0.9rem; fill: none; stroke: currentColor; stroke-width: 1.6; }
+  @media (max-width: 520px) {
+    .mode-toggle { min-height: 44px; padding: 0.62rem 0.7rem; font-size: 0.64rem; }
+  }
+  @media print { .mode-toggle { display: none; } }
+
+  /* ---- STICKY HEADER AT 360px --------------------------------------
+     .top-meta is a flex row and flex children default to min-width auto,
+     so at 360px the eyebrow and the step counter used to overlap. The
+     eyebrow now takes the free space and truncates rather than pushing
+     the counter off. Renders correctly at 375px and above either way,
+     which is why this was missed. 360 is common on mid-range Android.
+     ----------------------------------------------------------------- */
+  .top-meta { gap: 0.7rem; flex-wrap: nowrap; }
+  .top-meta > * { min-width: 0; }
+  .top-meta #lesson-tag, .top-meta .top-label {
+    flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .top-meta .top-count { flex: 0 0 auto; white-space: nowrap; }
+  @media (max-width: 380px) {
+    .top-meta { font-size: 0.62rem; letter-spacing: 0.09em; }
+  }
+
+
+/* GLOBALISATION: container yard
+   Checked against the identity register before designing. Vietnam holds cream
+   paper, a serif and soft rounded cards. USA 1920s holds near-black deco. Black
+   Power holds the placard press. Civil Rights holds counter and column. Congo
+   holds ore seam. Black Consciousness holds frank talk on manila. Cold War
+   origins holds zone: cold paper, a 45 degree hatch, cards bounded top and left,
+   condensed sans headings over a serif body.
+
+   Container yard takes the metaphor the topic supplies. A port stacks identical
+   steel boxes in rows, and what is inside them is invisible from the outside.
+   Cool grey ground, container orange for structure, sea teal for anything the
+   learner earned.
+
+   Signature moves, each chosen because nothing else on the register uses it:
+     - a square dot grid ground, where zone hatches at 45 degrees
+     - cards fully bounded by a hairline with one solid bar down the left edge,
+       the painted stripe on a container end. Zone leaves its cards open
+     - serif headings over a sans body, which inverts zone exactly
+     - labels are outlined, not filled, and each carries a leading square node
+     - a source is a docket: reversed-out mono header bar over a cut ground
+     - mono appears on the source header and nowhere else */
+
+:root {
+  --sand:  #ECEEF0;   /* page: cold grey */
+  --paper: #F8FAFB;   /* cards */
+  --cut:   #E1E6E9;   /* insets, sources, carousels */
+  --ink:   #14202A;
+  --clay:  #4C5A63;   /* stage tags, quiet labels */
+  --fade:  #5F6B73;
+  /* container orange for structure, sea teal for reward */
+  --a1: #BC4E1B;  --a1-rgb: 188,78,27;
+  --a2: #0F6469;  --a2-rgb: 15,100,105;
+  --sans:  system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --serif: Georgia, 'Times New Roman', serif;
+  --mono:  ui-monospace, 'Cascadia Code', Consolas, 'Courier New', monospace;
+}
+
+/* Ground: a square dot grid. Containers stacked in rows, seen from above. */
+body {
+  font-family: var(--sans) !important;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(20,32,42,0.10) 1px, transparent 1.6px) !important;
+  background-size: 22px 22px !important;
+}
+h1, h2, h3 {
+  font-family: var(--serif) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.005em !important;
+}
+
+/* Cards: hairline box with one solid bar down the left. A painted stripe. */
+.card, .stat-wrap, .carousel, .kt {
+  border: 1px solid var(--hair) !important;
+  border-left: 7px solid var(--a1) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: var(--paper) !important;
+}
+
+/* Labels: outlined plates with a leading square node. Nothing filled. */
+.stage-tag, .kt-label, .expl-label, .pop-label, .runsum-label, .breakdown-label {
+  font-family: var(--sans) !important;
+  background: transparent !important;
+  color: var(--a2) !important;
+  border: 1px solid rgba(var(--a2-rgb),0.45) !important;
+  border-radius: 0 !important;
+  display: inline-block !important;
+  padding: 0.3rem 0.6rem 0.3rem 0.55rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.16em !important;
+  font-size: 0.63rem !important;
+  font-weight: 700 !important;
+}
+.stage-tag::before, .kt-label::before, .expl-label::before, .pop-label::before {
+  content: "";
+  display: inline-block;
+  width: 6px; height: 6px;
+  background: var(--a1);
+  margin-right: 0.5rem;
+  vertical-align: 1px;
+}
+
+/* A source is a docket: reversed-out mono header over a cut ground. */
+.source {
+  background: var(--cut) !important;
+  border: 1px solid var(--hair-strong) !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+.source-attr {
+  font-family: var(--mono) !important;
+  background: var(--ink) !important;
+  color: var(--paper) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  display: block !important;
+  padding: 0.7rem 0.9rem !important;
+  font-size: 0.72rem !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.01em !important;
+  text-transform: none !important;
+}
+.source-body { padding: 1.1rem 1rem 0.4rem !important; }
+.source .toggle-btn { margin: 0 1rem 1rem !important; border-radius: 0 !important; }
+.source .toggle-body { padding: 0 1rem 1rem !important; }
+
+/* Options: square, with the letter in a hard orange node. */
+.option, .option-btn { border-radius: 0 !important; }
+.option-letter, .opt-letter { border-radius: 0 !important; }
+
+/* Buttons: square, no rounding anywhere. */
+.btn-primary, .btn-secondary, .btn-begin, .pop-btn, .toggle-btn, .secondary-btn {
+  border-radius: 0 !important;
+}
+
+/* Dividers: a dashed route line with a node sitting on it. */
+.rule, .cover-rule, .flourish, .story-rule {
+  background: none !important;
+  height: 9px !important;
+  background-image:
+    linear-gradient(90deg, transparent 0 0),
+    repeating-linear-gradient(90deg, var(--a1) 0 7px, transparent 7px 14px) !important;
+  background-position: left center !important;
+  background-repeat: repeat-x !important;
+  background-size: auto 1px !important;
+}
+
+/* Cover flourish: three offset squares, containers seen end on. */
+.cover-rule { position: relative; }
+
+.stat-num { color: var(--a1) !important; font-family: var(--serif) !important; font-weight: 700 !important; }
+.stat-label { color: var(--clay) !important; font-family: var(--sans) !important; }
+
+
+/* ---- DARK MODE ------------------------------------------------------------
+   The yard at night. The dot grid stays, lit rather than printed. */
+body.alt {
+  --sand:  #101619;
+  --paper: #192227;
+  --cut:   #212C32;
+  --ink:   #E9EFF2;
+  --clay:  #A3B0B8;
+  --fade:  #93A0A8;
+  --a1: #E8834A;  --a1-rgb: 232,131,74;
+  --a2: #55B7BC;  --a2-rgb: 85,183,188;
+}
+body.alt {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(233,239,242,0.11) 1px, transparent 1.6px) !important;
+  background-size: 22px 22px !important;
+}
+body.alt .card, body.alt .stat-wrap, body.alt .carousel, body.alt .kt {
+  border-color: rgba(233,239,242,0.16) !important;
+  border-left-color: var(--a1) !important;
+}
+body.alt .source { background: var(--cut) !important; border-color: rgba(233,239,242,0.22) !important; }
+body.alt .source-attr { background: #0B1215 !important; color: #E9EFF2 !important; }
+body.alt .stage-tag, body.alt .kt-label, body.alt .expl-label,
+body.alt .pop-label, body.alt .runsum-label, body.alt .breakdown-label {
+  color: #8FD3D7 !important; border-color: rgba(85,183,188,0.55) !important; background: transparent !important;
+}
+body.alt .btn-begin { background: var(--a1) !important; border-color: var(--a1) !important; color: #101619 !important; }
+body.alt .btn-begin:hover { background: #F09A67 !important; border-color: #F09A67 !important; }
+body.alt .mode-toggle { background: #232E35 !important; color: #C7D2D8 !important; border-color: rgba(233,239,242,0.22) !important; box-shadow: 0 2px 10px rgba(0,0,0,0.45) !important; }
+body.alt .mode-toggle:hover { color: #E9EFF2 !important; border-color: rgba(233,239,242,0.40) !important; }
+body.alt .rule, body.alt .cover-rule, body.alt .flourish, body.alt .story-rule {
+  background-image: repeating-linear-gradient(90deg, var(--a1) 0 7px, transparent 7px 14px) !important;
+}
+body.alt .chip { background: rgba(232,131,74,0.18) !important; color: #F6C6A6 !important; }
+body.alt .chip-recall,     body.alt .chip-extract   { background: rgba(232,131,74,0.22) !important; color: #F8D3BA !important; }
+body.alt .chip-understand, body.alt .chip-interpret { background: rgba(85,183,188,0.22) !important; color: #B9E6E8 !important; }
+body.alt .chip-apply,      body.alt .chip-evaluate  { background: rgba(233,239,242,0.18) !important; color: #E9EFF2 !important; }
+
+/* ---- DARK MODE STATE COLOURS ---------------------------------------------- */
+body.alt .option, body.alt .option-btn {
+  background: var(--cut) !important;
+  border-color: rgba(233,239,242,0.22) !important;
+  color: var(--ink) !important;
+}
+body.alt .option.selected, body.alt .option-btn.selected {
+  background: rgba(85,183,188,0.18) !important; border-color: #55B7BC !important; }
+body.alt .option.correct, body.alt .option-btn.correct {
+  background: rgba(85,183,188,0.24) !important; border-color: #55B7BC !important; color: var(--ink) !important; }
+body.alt .option.wrong, body.alt .option-btn.wrong {
+  background: rgba(232,131,74,0.20) !important; border-color: #E8834A !important; color: var(--ink) !important; }
+body.alt .secondary-btn:hover:not(:disabled) { background: var(--cut) !important; }
+body.alt .explanation { background: var(--cut) !important; border-color: rgba(85,183,188,0.30) !important; }
+body.alt .expl-text { color: var(--ink) !important; }
+body.alt .quiz-foot, body.alt .quiz-foot a { color: var(--clay) !important; }
+
+/* The dimmed state fell below readable contrast at 360px. Raised in both modes. */
+.option.dimmed, .option-btn.dimmed { opacity: 0.82 !important; }
+body.alt .option.dimmed, body.alt .option-btn.dimmed { opacity: 0.86 !important; }
+
+/* Button hover must not read as a different colour family. */
+.btn-primary:hover:not(:disabled) { background: #0B4B4F !important; }
+body.alt .btn-primary:hover:not(:disabled) { background: #6FC7CB !important; color: #101619 !important; }
+
+/* The toggle is a rounded pill on a white ground, the one round thing in a
+   skin of hard edges. It is fixed bottom right and lands on Continue on a
+   short viewport. */
+.mode-toggle {
+  bottom: 1rem; right: 1rem;
+  border-radius: 999px !important;
+  font-family: var(--sans) !important;
+  background: #FFFFFF !important;
+  color: #4C5A63 !important;
+  border: 1px solid rgba(20,32,42,0.14) !important;
+  padding: 0.62rem 1.05rem !important;
+  gap: 0.5rem !important;
+  letter-spacing: 0.14em !important;
+  box-shadow: 0 2px 10px rgba(20,32,42,0.10) !important;
+}
+.mode-toggle:hover { color: #14202A !important; border-color: rgba(20,32,42,0.30) !important; }
+.mode-toggle svg { width: 0.95rem !important; height: 0.95rem !important; stroke-width: 1.8 !important; }
+body { padding-bottom: 4.5rem !important; }
+@media (max-width: 520px) {
+  .mode-toggle { bottom: 0.7rem; right: 0.7rem; padding: 0.45rem 0.6rem; font-size: 0.6rem; }
+  .card, .stat-wrap, .carousel, .kt { border-left-width: 5px !important; }
+}
+
+/* Figures. Caption reads left at a measure that holds on a phone. */
+.figure figcaption {
+  text-align: left !important;
+  max-width: 34rem;
+  margin-left: auto; margin-right: auto;
+  font-family: var(--sans) !important;
+  font-size: 0.82rem !important;
+  color: var(--clay) !important;
+  border-top: 2px solid var(--a1);
+  padding-top: 0.6rem;
+}
+.figure img { border: 1px solid rgba(188,78,27,0.35) !important; border-radius: 0 !important; width: 100%; height: auto; }
+body.alt .figure img { border-color: rgba(232,131,74,0.40) !important; filter: brightness(0.92) contrast(1.02); }
+body.alt .figure figcaption { border-top-color: var(--a1); }
+
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background:
+      repeating-linear-gradient(90deg, rgba(var(--a1-rgb),0.05) 0 1px, transparent 1px 5px),
+      radial-gradient(ellipse at top right, rgba(var(--a1-rgb),0.10) 0%, transparent 58%),
+      radial-gradient(ellipse at bottom left, rgba(var(--a2-rgb),0.09) 0%, transparent 58%),
+      var(--sand);
+    padding: 1.6rem 1rem 3rem;
+    font-family: var(--serif);
+    color: var(--ink); line-height: 1.6; -webkit-text-size-adjust: 100%;
+    -webkit-user-select: none; user-select: none;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+  .top-bar { margin-bottom: 1.6rem; }
+  .top-meta { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--sans); font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--a2); font-weight: 700; margin-bottom: 0.55rem; gap: 0.7rem; flex-wrap: nowrap; }
+  /* Flex children default to min-width auto, so at 360px the eyebrow and the
+     step counter used to overlap. The eyebrow takes the free space and
+     truncates instead of pushing the counter off the row. */
+  .top-meta > * { min-width: 0; }
+  .top-meta #lesson-tag, .top-meta .top-label { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .top-meta .top-count { flex: 0 0 auto; white-space: nowrap; }
+  @media (max-width: 380px) { .top-meta { font-size: 0.62rem; letter-spacing: 0.09em; } }
+  .top-count { color: var(--fade); font-weight: 500; letter-spacing: 0.04em; text-transform: none; }
+  .track { height: 3px; background: var(--hair); overflow: hidden; }
+  .fill { height: 100%; background: var(--a1); transition: width 0.35s ease; width: 0%; }
+
+  /* Cover */
+  .cover { text-align: center; padding: 1.2rem 0 1rem; }
+  .cover-eyebrow { font-family: var(--sans); font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--clay); font-weight: 700; margin-bottom: 1.4rem; }
+  .cover-title { font-size: clamp(2.3rem,7vw,3.6rem); font-weight: 800; line-height: 1.03; letter-spacing: -0.025em; margin-bottom: 1.3rem; }
+  .flourish { width: 92px; height: 9px; margin: 0 auto 1.6rem;
+    background:
+      radial-gradient(circle at 9px 4.5px, var(--a1) 0 4px, transparent 4.5px),
+      radial-gradient(circle at 46px 4.5px, var(--a1) 0 4px, transparent 4.5px),
+      radial-gradient(circle at 83px 4.5px, var(--a1) 0 4px, transparent 4.5px); }
+  .cover-line { font-size: 1.16rem; line-height: 1.7; color: var(--muted); font-style: italic; max-width: 30rem; margin: 0 auto 2rem; min-height: 5.5rem; }
+  .cover-line span { opacity: 0; transition: opacity 0.5s ease; }
+  .cover-line span.vis { opacity: 1; }
+  .cover-time { font-family: var(--sans); font-size: 0.8rem; color: var(--fade); margin-top: 1.4rem; letter-spacing: 0.02em; }
+  .btn-begin { font-family: var(--sans); display: inline-flex; align-items: center; gap: 0.8rem; padding: 1.05rem 2.2rem; background: var(--ink); color: var(--on-ink); border: none; cursor: pointer; font-size: 1.12rem; font-weight: 700; }
+  .btn-begin:hover { background: var(--ink-deep); }
+  .btn-begin .sa { color: var(--a1); font-size: 1.3rem; }
+  .skip-link { display: block; margin: 1.6rem auto 0; background: transparent; border: none; color: var(--fade); font-family: var(--sans); font-size: 0.84rem; cursor: pointer; text-decoration: underline; }
+
+  /* Story hook */
+  .story { padding: 0.6rem 0 0.4rem; min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
+  .story-num { font-family: var(--serif); font-size: clamp(2.6rem,9vw,4rem); font-weight: 800; color: var(--a1); line-height: 1; letter-spacing: -0.02em; }
+  .story-unit { font-family: var(--sans); font-size: 0.82rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fade); font-weight: 700; margin-top: 0.5rem; }
+  .story-rule { width: 100%; height: 1px; background: var(--hair-strong); margin: 1.4rem 0 1.6rem; }
+  .story-line { font-size: 1.24rem; line-height: 1.66; margin-bottom: 1.05rem; opacity: 0; transform: translateY(6px); transition: opacity 0.55s ease, transform 0.55s ease; }
+  .story-line.vis { opacity: 1; transform: translateY(0); }
+  .story-line.last { color: var(--a2); font-style: italic; font-weight: 600; }
+
+  /* Content cards */
+  .card { background: var(--paper); border: 1px solid var(--hair); border-left: 5px solid var(--a1); padding: 1.7rem 1.5rem; margin-bottom: 1.3rem; }
+  .stage-tag { font-family: var(--sans); font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--clay); font-weight: 700; margin-bottom: 0.9rem; }
+  .card h2 { font-family: var(--sans); font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 0.9rem; }
+  .card p { font-size: 1.04rem; line-height: 1.74; margin-bottom: 0.9rem; }
+  .card p:last-child { margin-bottom: 0; }
+  .key { color: var(--a2); font-weight: 700; }        /* one emphasis colour, body face kept */
+  .card strong { color: var(--a2); font-weight: 700; }
+  .pull { border-left: 4px solid var(--a2); padding: 0.15rem 0 0.15rem 1rem; font-weight: 600; color: var(--ink); margin: 1.15rem 0; font-style: italic; }
+  .figure { margin: 1rem 0 0.3rem; }
+  .figure img { display: block; height: auto; border: 1px solid var(--hair-strong); margin: 0 auto; }
+  .figure.wide img { width: 100%; max-width: 460px; }
+  .figure.portrait img { width: 100%; max-width: 320px; }
+  .figure figcaption { font-family: var(--serif); font-size: 0.82rem; color: var(--fade); margin-top: 0.5rem; line-height: 1.55; text-align: center; }
+
+  /* Carousel */
+  .car-wrap { margin: 0.4rem 0 0; }
+  .car-prompt { font-family: var(--sans); font-size: 0.82rem; color: var(--a2); font-weight: 700; margin-bottom: 0.8rem; }
+  .car-frame { background: var(--cut); border: 1px solid var(--hair); border-top: 3px solid var(--a1); padding: 1.4rem 1.35rem; min-height: 8.5rem; display: flex; align-items: center; }
+  .car-card { font-size: 1.06rem; line-height: 1.7; width: 100%; }
+  .car-card .cc-lead { font-family: var(--sans); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--clay); display: block; margin-bottom: 0.5rem; }
+  .car-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 0.9rem; gap: 1rem; }
+  .car-dots { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .car-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hair-strong); }
+  .car-dot.read { background: var(--a2); }
+  .car-dot.here { outline: 2px solid var(--a1); outline-offset: 2px; }
+  .car-count { font-family: var(--sans); font-size: 0.78rem; color: var(--fade); font-weight: 600; }
+  .car-btns { display: flex; gap: 0.5rem; }
+  .car-btn { font-family: var(--sans); width: 2.4rem; height: 2.4rem; background: var(--paper); border: 1px solid var(--hair-strong); color: var(--ink); font-size: 1.1rem; cursor: pointer; }
+  .car-btn:disabled { opacity: 0.32; cursor: not-allowed; }
+
+  /* Stat strip */
+  .stat-strip { display: grid; grid-template-columns: repeat(auto-fit,minmax(120px,1fr)); gap: 0.8rem; margin: 0.5rem 0 0.2rem; }
+  .stat { background: var(--cut); border: 1px solid var(--hair); border-top: 3px solid var(--a2); padding: 1.1rem 0.7rem; text-align: center; }
+  .stat-num { font-family: var(--serif); font-size: 2rem; font-weight: 800; color: var(--a2); line-height: 1; letter-spacing: -0.02em; }
+  .stat-label { font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--fade); margin-top: 0.5rem; line-height: 1.4; }
+
+  /* Key terms + memory boxes (collapsed) */
+  /* Key terms strip: label + individual expandable chips */
+  .kt { margin-top: 1.3rem; }
+  .kt-label { font-family: var(--sans); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--a1); padding-top: 0.85rem; border-top: 1px dashed var(--hair-strong); }
+  .kt-row { display: flex; flex-wrap: wrap; gap: 0.55rem; margin-top: 0.85rem; }
+  .kt-term { border: 1px solid var(--hair-strong); background: transparent; }
+  .kt-term summary { font-family: var(--sans); font-size: 0.92rem; font-weight: 600; color: var(--ink); cursor: pointer; list-style: none; padding: 0.55rem 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .kt-term summary::-webkit-details-marker { display: none; }
+  .kt-term summary::after { content: "+"; color: var(--a1); font-weight: 800; font-size: 1.05rem; }
+  .kt-term[open] { display: block; width: 100%; }
+  .kt-term[open] summary::after { content: "\2212"; }
+  .kt-def { font-size: 0.94rem; line-height: 1.62; color: var(--muted); padding: 0 0.85rem 0.75rem; }
+
+  /* Remember box (collapsed) */
+  .remember { margin-top: 0.9rem; border-top: 1px dashed var(--hair-strong); padding-top: 0.7rem; }
+  .remember summary { font-family: var(--sans); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; color: var(--a1); cursor: pointer; list-style: none; }
+  .remember summary::-webkit-details-marker { display: none; }
+  .remember summary::before { content: "+ "; font-weight: 800; }
+  .remember[open] summary::before { content: "\2212 "; }
+  .remember .disc-body { font-size: 0.96rem; line-height: 1.68; color: var(--muted); margin-top: 0.6rem; background: rgba(var(--a2-rgb),0.06); border-left: 3px solid var(--a2); padding: 0.7rem 0.9rem; }
+
+  /* Sources */
+  .source { position: relative; background: var(--cut); border: 1px solid var(--hair); border-top: 3px solid var(--a2); box-shadow: 6px 6px 0 rgba(var(--a2-rgb),0.13); padding: 1.2rem 1.3rem; margin: 1.15rem 0 1.6rem; }
+  .source-attr { font-family: var(--sans); font-size: 0.8rem; color: var(--clay); font-weight: 600; margin-bottom: 0.75rem; line-height: 1.5; }
+  .source-body { font-size: 1.02rem; line-height: 1.74; }
+  .source-body em { color: var(--a2); font-style: italic; }
+  .toggle-btn { font-family: var(--sans); background: transparent; border: none; color: var(--a1); cursor: pointer; font-size: 0.88rem; font-weight: 600; text-decoration: underline; padding: 0.7rem 0 0; }
+  .toggle-body { display: none; margin-top: 0.7rem; padding-top: 0.7rem; border-top: 1px dashed var(--hair-strong); font-size: 0.94rem; color: var(--muted); line-height: 1.66; }
+  .toggle-body.open { display: block; }
+
+  /* Questions */
+  .q-text { font-size: 1.16rem; line-height: 1.5; font-weight: 600; margin-bottom: 1.2rem; }
+  .options { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.2rem; }
+  .option { display: flex; align-items: flex-start; gap: 0.85rem; padding: 1rem 1.05rem; background: var(--sand); border: 1px solid var(--hair); cursor: pointer; font-family: var(--serif); text-align: left; font-size: 0.99rem; line-height: 1.55; color: var(--ink); width: 100%; }
+  .option:hover:not(:disabled) { background: var(--cut); border-color: var(--a1); }
+  .option:disabled { cursor: default; }
+  .option.selected { background: var(--cut); border-color: var(--a1); border-width: 2px; padding: 0.94rem 0.99rem; }
+  .option.correct { background: var(--ok-bg); border-color: var(--a2); border-width: 2px; padding: 0.94rem 0.99rem; }
+  .option.wrong { background: var(--no-bg); border-color: var(--clay); border-width: 2px; padding: 0.94rem 0.99rem; }
+  .option.dimmed { opacity: 0.46; }
+  body.alt .option.dimmed { opacity: 0.72; }
+  .opt-letter { font-family: var(--serif); font-weight: 800; color: var(--a1); min-width: 1.1rem; }
+  .opt-text { flex: 1; }
+  .opt-mark { font-weight: 700; font-size: 1.1rem; }
+  .explanation { background: var(--cut); border: 1px solid var(--hair); border-left: 5px solid var(--a2); padding: 1.15rem 1.2rem; }
+  .expl-label { font-family: var(--sans); font-size: 0.66rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--a2); font-weight: 700; margin-bottom: 0.5rem; }
+  .expl-text { line-height: 1.7; font-size: 0.96rem; }
+  .chip { display: inline-block; font-family: var(--sans); padding: 0.22rem 0.65rem; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+  .chip-argue { background: var(--chip-a-bg); color: var(--chip-a-fg); }
+  .chip-evidence { background: var(--chip-a-bg); color: var(--chip-a-fg); }
+  .chip-weigh { background: var(--a2); color: var(--on-a2); }
+  .chip-extract { background: var(--chip-a-bg); color: var(--chip-a-fg); }
+  .chip-interpret { background: var(--chip-b-bg); color: var(--chip-b-fg); }
+  .chip-evaluate { background: var(--a2); color: var(--on-a2); }
+  .chip-instinct { background: var(--chip-c-bg); color: var(--clay); }
+
+  /* Reopen the source from inside a question */
+  .srcpeek { border: 1px solid var(--clay); background: rgba(var(--a1-rgb),0.07); margin: 0 0 1rem; }
+  .srcpeek summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 0.7rem; padding: 0.8rem 0.85rem; color: var(--clay); }
+  .srcpeek summary::-webkit-details-marker { display: none; }
+  .srcpeek .chev { flex: 0 0 auto; transition: transform 0.18s ease; }
+  .srcpeek[open] .chev { transform: rotate(90deg); }
+  .srcpeek .peek-cue { font-family: var(--sans); font-size: 0.92rem; font-weight: 700; line-height: 1.25; color: var(--ink); }
+  .srcpeek .peek-who { display: block; font-family: var(--sans); font-size: 0.66rem; letter-spacing: 0.09em; text-transform: uppercase; font-weight: 400; color: var(--muted); margin-top: 0.25rem; }
+  .srcpeek[open] .peek-cue { color: var(--muted); }
+  .srcpeek .peek-body { padding: 0 0.85rem 0.85rem; font-size: 0.94rem; line-height: 1.62; border-top: 1px solid var(--rule); margin: 0 0.85rem; padding-left: 0; padding-right: 0; }
+  .srcpeek .peek-body p { margin: 0.7rem 0 0; }
+
+  /* v2.1 multi-source reopen. Tabs plus a swipeable track, so every source in
+     the file is reachable from any question. Absent on a single-source lesson,
+     which renders exactly as it did before. */
+  .srcpeek.multi .peek-body { padding-bottom: 0.5rem; }
+  .peek-tabs { display: flex; gap: 0.4rem; overflow-x: auto; padding: 0.7rem 0 0.6rem;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .peek-tabs::-webkit-scrollbar { display: none; }
+  .peek-tab { flex: 0 0 auto; min-height: 40px; padding: 0.45rem 0.85rem;
+    font-family: var(--sans); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; cursor: pointer;
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--rule); border-radius: 0; }
+  .peek-tab.on { background: var(--a1); color: var(--on-a1); border-color: var(--a1); }
+  .peek-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 0; }
+  .peek-track::-webkit-scrollbar { display: none; }
+  .peek-slide { flex: 0 0 100%; scroll-snap-align: start; padding-right: 0.1rem; }
+  .peek-slide .peek-attr { font-family: var(--sans); font-size: 0.66rem; font-weight: 700;
+    line-height: 1.45; color: var(--muted); padding-bottom: 0.5rem; margin-bottom: 0.6rem;
+    border-bottom: 1px solid var(--rule); }
+  .peek-slide p { margin: 0.7rem 0 0; }
+  .srcpeek.multi::after { content: "Swipe, or tap a source above."; display: block;
+    font-family: var(--sans); font-size: 0.66rem; letter-spacing: 0.06em; color: var(--muted);
+    padding: 0.55rem 0 0.2rem; }
+  .srcpeek.multi:not([open])::after { display: none; }
+
+  .marks { font-family: var(--mono, var(--sans)); font-size: 0.68rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--a1); font-weight: 700; margin-left: 0.7rem; }
+  .q-meta { margin-bottom: 0.9rem; }
+
+  /* order + sort interactions */
+  .inter { margin: 0.4rem 0 1rem; }
+  .inter-pool { display: flex; flex-direction: column; gap: 0.5rem; }
+  .inter-item { font-family: var(--serif); text-align: left; padding: 0.85rem 1rem; background: var(--sand); border: 1px solid var(--hair); cursor: pointer; font-size: 0.97rem; line-height: 1.5; color: var(--ink); display: flex; gap: 0.7rem; align-items: baseline; }
+  .inter-item:hover:not(:disabled) { border-color: var(--a1); background: var(--cut); }
+  .inter-item .rank { font-family: var(--sans); font-weight: 800; color: var(--a1); min-width: 1.4rem; }
+  .inter-placed { background: var(--cut); border-color: var(--a2); }
+  .inter-item.ok { background: var(--ok-bg); border-color: var(--a2); }
+  .inter-item.no { background: var(--no-bg); border-color: var(--clay); }
+  .sort-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+  .sort-col { background: var(--inset); border: 1px dashed var(--hair-strong); padding: 0.7rem; min-height: 4rem; }
+  .sort-col h4 { font-family: var(--sans); font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--clay); font-weight: 700; margin-bottom: 0.6rem; text-align: center; }
+  .sort-btns { display: flex; gap: 0.4rem; margin-top: 0.5rem; }
+  .sort-place { font-family: var(--sans); flex: 1; font-size: 0.78rem; font-weight: 700; padding: 0.4rem; background: var(--paper); border: 1px solid var(--hair-strong); cursor: pointer; color: var(--ink); }
+
+  /* Running summary */
+  .runsum { background: rgba(var(--a2-rgb),0.08); border: 1px solid rgba(var(--a2-rgb),0.28); border-left: 5px solid var(--a2); padding: 1.3rem 1.4rem; }
+  .runsum-label { font-family: var(--sans); font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--a2); font-weight: 700; margin-bottom: 0.9rem; }
+  .runsum ol { margin: 0; padding-left: 1.3rem; }
+  .runsum li { font-size: 1.02rem; line-height: 1.66; margin-bottom: 0.7rem; color: var(--ink); }
+  .runsum li:last-child { margin-bottom: 0; }
+  .runsum li.fresh { font-weight: 700; color: var(--a2); }
+
+  /* Popup */
+  .pop-back { position: fixed; inset: 0; background: var(--scrim); display: flex; align-items: center; justify-content: center; padding: 1.5rem; z-index: 50; }
+  .pop { background: var(--paper); border-top: 5px solid var(--a2); padding: 1.6rem 1.5rem; max-width: 30rem; width: 100%; box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+  .pop-label { font-family: var(--sans); font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--a2); font-weight: 700; margin-bottom: 0.8rem; }
+  .pop-text { font-size: 1.1rem; line-height: 1.6; font-weight: 600; color: var(--ink); margin-bottom: 1.3rem; }
+  .pop-btn { font-family: var(--sans); width: 100%; padding: 0.9rem; background: var(--a2); border: none; color: var(--on-a2); font-size: 0.98rem; font-weight: 700; cursor: pointer; }
+
+  /* Nav */
+  .nav { display: flex; justify-content: space-between; gap: 0.8rem; margin-top: 1rem; }
+  .btn-secondary { font-family: var(--sans); padding: 0.8rem 1.2rem; background: transparent; border: 1px solid var(--hair-strong); color: var(--ink); font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+  .btn-secondary:hover:not(:disabled) { background: var(--paper); }
+  .btn-primary { font-family: var(--sans); padding: 0.85rem 1.5rem; background: var(--a2); border: none; color: var(--on-a2); font-size: 0.95rem; cursor: pointer; font-weight: 700; }
+  .btn-primary:hover:not(:disabled) { background: var(--a2-deep); }
+  .btn-primary:disabled { opacity: 0.34; cursor: not-allowed; }
+
+  /* Results */
+  .results-head { text-align: center; margin-bottom: 1.8rem; }
+  .results-eyebrow { font-family: var(--sans); font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--clay); font-weight: 700; margin-bottom: 0.8rem; }
+  .results-title { font-family: var(--sans); font-size: clamp(1.9rem,5.5vw,2.7rem); font-weight: 800; letter-spacing: -0.02em; }
+  .score-row { display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: 0.9rem; margin-bottom: 1.4rem; }
+  .score-block { background: var(--paper); border: 1px solid var(--hair); border-top: 4px solid var(--a1); padding: 1.3rem 0.8rem; text-align: center; }
+  .score-num { font-family: var(--serif); font-size: 2.6rem; font-weight: 800; color: var(--ink); line-height: 1; letter-spacing: -0.03em; }
+  .score-den { font-family: var(--serif); font-size: 1.1rem; color: var(--fade); font-weight: 500; }
+  .score-word { font-family: var(--serif); font-size: 1.3rem; font-weight: 800; color: var(--a2); line-height: 2; }
+  .score-label { font-family: var(--sans); font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--fade); margin-top: 0.5rem; font-weight: 700; }
+  .grade-desc { text-align: center; margin-bottom: 1.6rem; padding: 0 0.5rem; line-height: 1.66; }
+  .breakdown { background: var(--paper); border: 1px solid var(--hair); padding: 1.3rem; margin-bottom: 1.4rem; }
+  .breakdown-label { font-family: var(--sans); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--a2); font-weight: 700; margin-bottom: 1rem; text-align: center; }
+  .bd-row { display: grid; grid-template-columns: 1fr 110px 46px; gap: 0.7rem; align-items: center; margin-bottom: 0.7rem; font-family: var(--serif); font-size: 0.9rem; }
+  .bd-name { font-weight: 600; }
+  .bd-bar { height: 9px; background: var(--hair); overflow: hidden; }
+  .bd-fill { height: 100%; background: var(--a2); }
+  .bd-score { color: var(--fade); text-align: right; font-weight: 700; }
+  .results-actions { display: flex; gap: 0.8rem; margin-top: 1.6rem; }
+  .results-actions button { flex: 1; }
+  .hidden { display: none !important; }
+
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="top-bar hidden" id="top-bar">
+    <div class="top-meta"><span id="lesson-tag">Kula Revise &middot; Grade 12 &middot; Globalisation</span><span class="top-count" id="step-count"></span></div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+  </div>
+  <div id="stage"></div>
+  <div class="nav hidden" id="nav">
+    <button class="btn-secondary" id="back-btn">&larr; Back</button>
+    <button class="btn-primary" id="next-btn">Continue &rarr;</button>
+  </div>
+</div>
+
+<script>
+/* kula: re-entry guard. Every declaration below is function scoped, so a
+   viewer that re-runs this script re-initialises instead of throwing a
+   redeclaration SyntaxError and leaving FLOW undefined. */
+(function(){
+const COVER = {
+  "eyebrow": "Kula Revise &middot; Grade 12 History &middot; A New Global World Order",
+  "title": "The World Gets Smaller",
+  "lines": [
+    "Your clothes were probably made in a country you have never visited.",
+    "The news you heard today came from one you may never see.",
+    "Trade between countries is old. Moving this much of it, this fast, is not. That is what this lesson is about."
+  ],
+  "begin": "Begin Lesson 1",
+  "time": "About 30 minutes. Lesson 1 of 5.",
+  "skip": true
+};
+
+const RESULTS = {
+  "eyebrow": "Lesson 1 report",
+  "title": "Where you stand",
+  "done": {
+    "label": "Lesson complete",
+    "title": "The World Gets Smaller",
+    "text": "Tap Done to continue to Lesson 2, Who Writes the Rules."
+  },
+  "footer": "Next: Lesson 2, and the people who decided how all this would work.",
+  "bands": {
+    "excellent": "You can read a source and say what it cannot tell you. Go on to Lesson 2.",
+    "strong": "Solid work. Read the photograph card once more, then go on to Lesson 2.",
+    "solid": "The shape is there. Go back over the two evaluate questions, then go on.",
+    "patchy": "Worth another run. The skill in this lesson comes back in every lesson after it.",
+    "start": "Take it again from the top. Read the source and its note before you answer anything."
+  }
+};
+
+const FLOW = [
+  {
+    "type": "story",
+    "marker": "A street you know",
+    "markerLabel": "Somewhere near you &middot; any month",
+    "lines": [
+      "A new shop opens on the corner of your street.",
+      "Your neighbour says it is the best thing that has happened here, because bread is cheaper and it stays open late.",
+      "The woman who ran the old shop says it took her customers and closed her down.",
+      "Same shop. Both true.",
+      "You already work out whose account to trust when two people describe one change. Now imagine the change is not one street. Imagine it is every country at once."
+    ]
+  },
+  {
+    "type": "question",
+    "kind": "instinct",
+    "q": "Who is giving you the more honest account of the new shop?",
+    "options": [
+      "Your neighbour, because cheaper bread is a fact and not an opinion",
+      "The woman who lost her shop, because she is the one who lost money",
+      "Both of them, because each one saw a different part of the same change",
+      "Neither of them, because people who are affected cannot describe it fairly"
+    ],
+    "correct": 2,
+    "explanation": "Nothing is scored here. Both people are telling the truth. Your neighbour buys bread at the new shop. The other woman used to sell it. They stand in different places, so they notice different things. In this lesson you will read a source made by someone who also stood in one place.",
+    "noSource": true
+  },
+  {
+    "type": "content",
+    "tag": "The turn",
+    "html": "<h2>The word for what you just did</h2><p>You did not decide who was lying. You worked out that each account came from where the speaker was standing.</p><p>That is <strong>perspective</strong>. Where a source stands changes what it notices.</p><p>When a source only shows you one side of a change, we call that <strong>bias</strong>. Bias does not mean the source is useless. It means you have to know who is speaking before you decide what the source proves.</p><p>Paper 2 asks this directly. It gives you a source and asks how far you can trust it, or what it leaves out. You will do that in this lesson on a photograph.</p>",
+    "remember": "Bias does not make a source worthless. It tells you what the source was made to show, and what it was never going to show.",
+    "terms": [
+      {
+        "term": "Perspective",
+        "def": "Where a person or a source stands on a topic, and how that changes what they say about it."
+      },
+      {
+        "term": "Bias",
+        "def": "When a source leans one way, usually because of who made it or why they made it."
+      },
+      {
+        "term": "Source",
+        "def": "Anything from the past or the present that gives you evidence: a speech, a photograph, a set of figures, a cartoon."
+      }
+    ]
+  },
+  {
+    "type": "content",
+    "tag": "The evidence",
+    "html": "<h2>What actually started moving</h2><p>Start with what is not new. Countries have traded with each other for centuries. Goods have crossed borders for as long as there have been borders.</p><p>What changed in the last decades of the twentieth century was the <strong>rate</strong>. Four things began crossing borders far faster than before: goods, money, people and ideas.</p><p>Goods are made in one country and sold in another. Money moves between banks in seconds. People move for work, for study and for safety. Ideas move fastest of all, because sending one costs almost nothing.</p><p>The word for all of this together is <strong>globalisation</strong>. It does not mean the world became one country. It means the distance between countries stopped mattering as much as it used to.</p>",
+    "remember": "Globalisation is not the start of world trade. World trade is old. What is new is the speed, and the fact that money, people and ideas move as fast as goods.",
+    "terms": [
+      {
+        "term": "Globalisation",
+        "def": "The way countries have become more connected through trade, money, technology and travel."
+      },
+      {
+        "term": "Rate",
+        "def": "How fast something happens. In this topic the rate matters more than the fact, because trade itself is not new."
+      },
+      {
+        "term": "Trade",
+        "def": "Buying and selling between countries. Exports are what a country sells out. Imports are what it buys in."
+      },
+      {
+        "term": "Border",
+        "def": "The line where one country ends and another begins."
+      }
+    ]
+  },
+  {
+    "type": "content",
+    "tag": "The evidence",
+    "html": "<h2>Why it sped up when it did</h2><p>Three changes did most of the work, and none of them was a political decision.</p><p>The steel container came first, in 1956. Before it, cargo was loaded by hand, box by box, and a ship could sit in port for a week. After it, a crane lifts a sealed box off a lorry and onto a ship in minutes. Shipping got so cheap that where a thing is made stopped mattering very much.</p><p>Then came cheap air travel, and then the internet. A factory in one country could now be run from an office in another.</p>",
+    "remember": "The container is the most important object in this topic. It made distance cheap, and cheap distance is what globalisation runs on.",
+    "terms": [
+      {
+        "term": "Container",
+        "def": "A sealed steel box of a standard size, moved between lorry, train and ship without being opened."
+      },
+      {
+        "term": "Cargo",
+        "def": "Goods carried by ship, plane or lorry."
+      },
+      {
+        "term": "Port",
+        "def": "A place where ships load and unload. Durban is the busiest container port in Africa."
+      }
+    ]
+  },
+  {
+    "type": "stat",
+    "tag": "Three numbers before the source",
+    "heading": "The scale of it, in three figures",
+    "lead": "<p>Hold these while you read the photograph on the next screen.</p>",
+    "stats": [
+      {
+        "num": "1956",
+        "label": "the year the first container ship sailed"
+      },
+      {
+        "num": "80%",
+        "label": "of world trade by volume still goes by sea"
+      },
+      {
+        "num": "1995",
+        "label": "the year the World Trade Organisation was set up"
+      }
+    ],
+    "terms": [
+      {
+        "term": "By volume",
+        "def": "Measured by how much space or weight, not by how much it is worth."
+      },
+      {
+        "term": "World Trade Organisation",
+        "def": "The body that sets the rules for trade between countries. You meet it properly in Lesson 2."
+      }
+    ]
+  },
+  {
+    "type": "source",
+    "tag": "The source",
+    "sourceLabel": "Source A",
+    "html": "<h2>Source A: a working port</h2><p>Read it twice.</p><p><strong>First pass:</strong> what can you actually see happening?</p><p><strong>Second pass:</strong> what is this photograph not able to show you?</p>",
+    "source": {
+      "attr": "SOURCE A  |  Photograph of the container terminal at Durban harbour, July 2015. Photo by Pechristener, published under a Creative Commons Attribution-ShareAlike 3.0 licence.",
+      "body": "<figure class=\"figure\"><img src=\"data:image/jpeg;base64,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\" alt=\"A container ship loading at Durban harbour, with cranes above it and people standing in shallow water in front of it.\"><figcaption>Durban harbour at low tide. A container ship of a Danish shipping line loads at Pier 2 while people stand fishing in the shallows. Photographed in July 2015. By then this was the busiest container port in Africa, handling goods moving between countries that had barely traded with each other thirty years before. Photo: Pechristener, CC BY-SA 3.0.</figcaption></figure>",
+      "toggle": "Two things are worth naming. The ship belongs to a Danish shipping line, and it is loading in a South African port: the company, the goods and the buyers are all in different countries, which is the whole point. The second thing is what the picture leaves out. You cannot see what is inside any container, where any of it is going, who made it, or what anyone was paid to make it. A photograph of trade shows you the boxes. It cannot show you the deal.",
+      "toggleLabel": "What does this actually mean?"
+    },
+    "terms": [
+      {
+        "term": "Terminal",
+        "def": "The part of a port where containers are loaded and unloaded."
+      },
+      {
+        "term": "Shipping line",
+        "def": "A company that owns ships and carries other people's goods for a fee."
+      }
+    ]
+  },
+  {
+    "type": "question",
+    "level": "Extract",
+    "mode": "sort",
+    "q": "Sort each statement by whether Source A shows it.",
+    "cols": [
+      "Source A shows this",
+      "Source A does not show this"
+    ],
+    "items": [
+      "Containers stacked on the deck of a ship",
+      "Cranes standing over the ship at the quay",
+      "The countries the containers are travelling to",
+      "What the goods inside the containers are worth"
+    ],
+    "answer": {
+      "0": 0,
+      "1": 0,
+      "2": 1,
+      "3": 1
+    },
+    "explanation": "The containers and the cranes are both in the picture. You can point at them. The other two are not in the picture. A photograph of a port makes you think about where the goods go and what they cost. The photograph does not show either of those. An extract question asks only for what you can see. If you write down what you guessed, the marker cannot give you the mark.",
+    "marks": "2 marks"
+  },
+  {
+    "type": "question",
+    "level": "Extract",
+    "q": "Define the term globalisation in your own words.",
+    "options": [
+      "Countries becoming more connected through trade, money, technology and travel",
+      "Countries agreeing to obey the same laws and share a single government",
+      "Rich countries sending aid to poorer countries so that they can develop",
+      "Companies moving their factories to countries where wages are much lower"
+    ],
+    "correct": 0,
+    "explanation": "Option {opt0} gives the full meaning. Countries became more connected in several ways, not only through trade. Many learners choose option {opt3}, because factories really do move to cheaper countries. That is one result of globalisation. It is not the meaning of the word. Option {opt1} says countries joined together, and that never happened. Option {opt2} describes aid. If your definition covers only one part, you will lose a mark.",
+    "marks": "2 marks"
+  },
+  {
+    "type": "question",
+    "level": "Interpret",
+    "q": "The ship in Source A belongs to a Danish company and is loading in a South African port. What does that suggest about trade now?",
+    "options": [
+      "A company can carry goods between countries it does not belong to",
+      "Denmark and South Africa must have signed a trade agreement together",
+      "South Africa cannot move its own goods without help from other countries",
+      "Danish companies now control most of the shipping that leaves Africa"
+    ],
+    "correct": 0,
+    "explanation": "Option {opt0} says what the picture shows. A Danish ship is loading in a South African port. The goods belong to neither country. Option {opt3} sounds similar, but it says Danish firms control most of the shipping. One photograph cannot prove that. Option {opt1} adds a trade agreement that nobody mentioned. Option {opt2} calls a normal business deal a weakness. The marker can only give you marks for what the source shows.",
+    "marks": "2 marks"
+  },
+  {
+    "type": "question",
+    "level": "Interpret",
+    "q": "Why did the standard steel container matter so much to how the world trades?",
+    "options": [
+      "It made moving goods cheaper and faster, so distance mattered much less",
+      "It kept cargo dry at sea, so fewer goods were damaged on the way",
+      "It let ports employ far more workers than they had employed before",
+      "It made ships much bigger, so countries had to build far bigger harbours"
+    ],
+    "correct": 0,
+    "explanation": "Option {opt0} gives the main reason. A sealed box goes from lorry to train to ship, and nobody opens it. Work that used to take days now takes minutes. Option {opt1} is true, but it is a small point. Option {opt2} is wrong, because containers replaced most of the dock workers. Option {opt3} has the order backwards. Bigger ships came after the container. If you give a small reason, the marker cannot give you full marks.",
+    "marks": "2 marks"
+  },
+  {
+    "type": "question",
+    "level": "Interpret",
+    "q": "Look again at the people standing in the shallows in front of the ship. What does putting them in the same frame suggest?",
+    "options": [
+      "World trade can happen next to ordinary lives without changing them",
+      "The people in the water are waiting for work at the terminal",
+      "Fishing and shipping want the same water and cannot share it",
+      "The port was built on ground that local people used to use"
+    ],
+    "correct": 0,
+    "explanation": "Option {opt0} says what the picture puts together. The ship and the people are in one photograph. They have nothing to do with each other. Options {opt1} and {opt3} tell a story about the people. The photograph does not show why they are standing there. Option {opt2} adds a fight over the water that nobody can see. You must be able to point at your answer in the source.",
+    "marks": "2 marks"
+  },
+  {
+    "type": "question",
+    "level": "Evaluate",
+    "q": "How useful is Source A to a historian studying who gained from globalisation?",
+    "options": [
+      "It is not very useful, because it shows the trade but not the profit",
+      "It is very useful, because a photograph records exactly what was there that day",
+      "It is of no use, because one photograph on its own proves nothing",
+      "It is very useful, because an independent photographer took it, not a firm"
+    ],
+    "correct": 0,
+    "explanation": "Option {opt0} answers the question and gives a reason. The photograph shows the trade happening. It does not show who made money. Option {opt1} says a photograph records what was there. That is true, but the question asked you about money. Option {opt3} says the photographer was independent. An honest photograph of boxes still only shows boxes. Option {opt2} says the source is no use at all. You were asked how useful it is, so you have to decide. A marker gives no marks for not deciding.",
+    "marks": "3 marks"
+  },
+  {
+    "type": "question",
+    "level": "Evaluate",
+    "q": "A shipping company and a dock workers' union both describe the container. Whose account would you expect to leave more out?",
+    "options": [
+      "The company, because it does not want to talk about the lost jobs",
+      "The union, because it speaks for one group and not for the whole country",
+      "Neither of them, because both were there and both know what happened",
+      "Both the same, because every account of the past leaves something out"
+    ],
+    "correct": 0,
+    "explanation": "Option {opt0} chooses one side and gives a reason. The company gained from the container. It will not want to talk about the dock jobs that disappeared. Option {opt1} says something true about the union, but the question did not ask about that. Options {opt2} and {opt3} do not choose at all. The question asks you to choose. If you do not choose, the marker keeps you at the lower marks.",
+    "marks": "3 marks"
+  },
+  {
+    "type": "carousel",
+    "tag": "Fact recap",
+    "heading": "Everything from this lesson worth writing down",
+    "cards": [
+      {
+        "lead": "Globalisation",
+        "body": "The way countries became more connected through trade, money, technology and travel. Not the start of world trade: world trade is old. What is new is the rate."
+      },
+      {
+        "lead": "Four things moving",
+        "body": "Goods, money, people and ideas. All four cross borders faster than they did fifty years ago."
+      },
+      {
+        "lead": "1956",
+        "body": "The first container ship sails. Cargo stops being loaded by hand and distance gets cheap."
+      },
+      {
+        "lead": "About 80%",
+        "body": "The share of world trade by volume that still travels by sea."
+      },
+      {
+        "lead": "1995",
+        "body": "The World Trade Organisation is set up to run the rules of world trade. Lesson 2 is about it."
+      },
+      {
+        "lead": "Perspective and bias",
+        "body": "Where a source stands changes what it shows. Bias does not make a source useless, but it tells you what to check."
+      }
+    ]
+  },
+  {
+    "type": "question",
+    "build": true,
+    "part": "Globalisation made goods, money, people and ideas cross borders faster than ever before, and the technology that made distance cheap arrived before anyone had decided who the change was supposed to benefit",
+    "q": "Which sentence best sums up what this lesson establishes?",
+    "options": [
+      "Globalisation made goods, money, people and ideas cross borders faster than ever before, and the technology that made distance cheap arrived before anyone had decided who the change was supposed to benefit",
+      "The container ship arrived in 1956, air travel became cheap, the internet followed, about eighty per cent of world trade still goes by sea, and the World Trade Organisation was set up in 1995",
+      "Globalisation connected the world and made every country richer than it had been before, which is why ports like Durban grew so quickly in the years after the container was introduced"
+    ],
+    "correct": 0,
+    "explanation": "Option {opt0} explains what happened and why it matters. The technology came first. The question of who gains came later. Option {opt1} lists the right dates, and many learners pick it for that reason. It never says what the dates led to. That is telling a story, and a story keeps you at the middle marks. Option {opt2} says everyone got richer. This lesson has not shown you that.",
+    "noSource": true,
+    "buildLabel": "What Lesson 1 argues"
+  },
+  {
+    "type": "runsum",
+    "tag": "Your running summary",
+    "heading": "What this lesson argues",
+    "label": "The argument so far"
+  },
+  {
+    "type": "content",
+    "tag": "Beyond the exam",
+    "html": "<h2>What this is worth outside the exam</h2><p>You did one thing in this lesson more than any other. You looked at a source and said what it could not tell you.</p><p>That is not only a History skill. Every day something reaches you with a frame around it: a clip, a headline, a number in an advert, a photograph of a crowd. Each one shows you what somebody chose to point at.</p><p>Asking who made this, and what is outside the frame, is the same move you just made on a photograph of a harbour.</p>",
+    "remember": "Before you decide what a source proves, find out who made it and what they were never going to show you.",
+    "terms": []
+  }
+];
+
+const CHIP = {
+  Argue:{cls:"chip-argue"}, Evidence:{cls:"chip-evidence"}, Weigh:{cls:"chip-weigh"},
+  Extract:{cls:"chip-extract"}, Interpret:{cls:"chip-interpret"}, Evaluate:{cls:"chip-evaluate"},
+  instinct:{cls:"chip-instinct"}
+};
+// A lesson carries one spine or the other. Work it out on first use rather than at
+// load time, so this never depends on FLOW having been evaluated yet.
+const SOURCE_SPINE = ["Extract","Interpret","Evaluate"];
+const ESSAY_SPINE  = ["Argue","Evidence","Weigh"];
+let _spine = null;
+function spine(){
+  if(_spine) return _spine;
+  const flow = (typeof FLOW !== "undefined" && Array.isArray(FLOW)) ? FLOW : [];
+  _spine = flow.some(s => s && SOURCE_SPINE.includes(s.level)) ? SOURCE_SPINE : ESSAY_SPINE;
+  return _spine;
+}
+// Never let an unknown label throw: an unrecognised spine word degrades to the neutral chip.
+const chipCls = lvl => (CHIP[lvl] || CHIP.instinct).cls;
+
+const stage = document.getElementById("stage");
+const nav = document.getElementById("nav");
+const topBar = document.getElementById("top-bar");
+const nextBtn = document.getElementById("next-btn");
+const backBtn = document.getElementById("back-btn");
+
+const state = {
+  idx: -1,                 // -1 = cover
+  answers: {},             // qIdx -> chosen content index (mcq) or serialized (interactive)
+  revealed: {},            // qIdx -> bool
+  order: {},               // qIdx -> shuffled content-index array
+  carRead: {},             // stepIdx -> Set of read card indices
+  interState: {},          // qIdx -> working state for order/sort
+  poppedBuild: {},         // qIdx -> bool (running-summary popup already shown)
+};
+
+const buildIds = FLOW.map((f,i)=>f.build?i:null).filter(i=>i!==null);
+const assessedIds = FLOW.map((f,i)=>(f.type==="question"&&f.level)?i:null).filter(i=>i!==null);
+
+function esc(s){
+  return String(s).replace(/[&<>"]/g, (c, i, str) => {
+    if(c === "&"){
+      // leave a real HTML entity intact (e.g. &middot; &amp; &#8635;)
+      const rest = str.slice(i);
+      if(/^&(#\d+|#x[0-9a-fA-F]+|[a-zA-Z]+);/.test(rest)) return "&";
+    }
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];
+  });
+}
+
+// {optN} -> the letter option N carries after shuffle
+function resolveOpts(text, order){
+  if(!text) return text;
+  return text.replace(/\{opt(\d+)\}/g,(m,n)=>{
+    const p = order ? order.indexOf(parseInt(n,10)) : -1;
+    return p>=0 ? String.fromCharCode(65+p) : m;
+  });
+}
+
+// ============ COVER ============
+function renderCover(){
+  topBar.classList.add("hidden");
+  nav.classList.add("hidden");
+  const lines = (COVER.lines||[]).map(l=>`<span>${esc(l)} </span>`).join("");
+  stage.innerHTML = `
+    <div class="cover">
+      <div class="cover-eyebrow">${COVER.eyebrow||""}</div>
+      <h1 class="cover-title">${esc(COVER.title||"")}</h1>
+      <div class="flourish"></div>
+      <div class="cover-line" id="cover-line">${lines}</div>
+      <button class="btn-begin" id="begin-btn">${COVER.begin||"Begin"} <span class="sa">&rarr;</span></button>
+      ${COVER.time?`<div class="cover-time">${esc(COVER.time)}</div>`:""}
+      ${COVER.skip!==false?`<button class="skip-link" id="skip-btn">Skip the opening if you have done this lesson before</button>`:""}
+    </div>`;
+  const spans = [...document.querySelectorAll("#cover-line span")];
+  spans.forEach((s,i)=>setTimeout(()=>s.classList.add("vis"), 350*(i+1)));
+  document.getElementById("begin-btn").addEventListener("click",()=>{ state.idx=0; render(); });
+  const skip = document.getElementById("skip-btn");
+  if(skip) skip.addEventListener("click",()=>{ state.idx = firstContentIdx(); render(); });
+}
+function firstContentIdx(){
+  const i = FLOW.findIndex(f=>f.type==="content"||f.type==="carousel"||f.type==="stat");
+  return i<0?0:i;
+}
+
+// ============ STORY HOOK ============
+function renderStory(item){
+  const lines = item.lines.map((l,i)=>{
+    const last = i===item.lines.length-1 ? " last" : "";
+    return `<div class="story-line${last}">${esc(l)}</div>`;
+  }).join("");
+  stage.innerHTML = `
+    <div class="story">
+      <div class="story-num">${esc(item.marker)}</div>
+      <div class="story-unit">${esc(item.markerLabel||"")}</div>
+      <div class="story-rule"></div>
+      ${lines}
+    </div>`;
+  const els = [...stage.querySelectorAll(".story-line")];
+  nextBtn.disabled = true;
+  els.forEach((el,i)=>setTimeout(()=>{
+    el.classList.add("vis");
+    if(i===els.length-1) nextBtn.disabled = false;
+  }, 650*(i+1)));
+}
+
+// ============ STATIC CONTENT ============
+// Key-terms strip: label + one expandable chip per term.
+function ktStrip(terms){
+  if(!terms || !terms.length) return "";
+  const chips = terms.map(t=>`<details class="kt-term"><summary>${esc(t.term)}</summary><div class="kt-def">${esc(t.def)}</div></details>`).join("");
+  return `<div class="kt"><div class="kt-label">Key terms &middot; tap to open</div><div class="kt-row">${chips}</div></div>`;
+}
+function rememberBox(text){
+  if(!text) return "";
+  return `<details class="remember"><summary>Remember it like this</summary><div class="disc-body">${text}</div></details>`;
+}
+
+function renderContent(item){
+  stage.innerHTML = `<div class="card">${item.tag?`<div class="stage-tag">${esc(item.tag)}</div>`:""}${item.html}${rememberBox(item.remember)}${ktStrip(item.terms)}</div>`;
+  bindToggles();
+}
+
+// ============ CAROUSEL ============
+function renderCarousel(item){
+  const cards = item.cards;
+  if(!state.carRead[state.idx]) state.carRead[state.idx] = new Set([0]);
+  const read = state.carRead[state.idx];
+  const pos = state.interState[state.idx]?.pos || 0;
+  read.add(pos);
+  const c = cards[pos];
+  const body = typeof c==="string" ? c : `<span class="cc-lead">${esc(c.lead)}</span>${esc(c.body)}`;
+  const dots = cards.map((_,i)=>`<span class="car-dot ${read.has(i)?"read":""} ${i===pos?"here":""}"></span>`).join("");
+  const allRead = read.size===cards.length;
+  stage.innerHTML = `
+    <div class="card">
+      ${item.tag?`<div class="stage-tag">${esc(item.tag)}</div>`:""}
+      ${item.heading?`<h2>${esc(item.heading)}</h2>`:""}
+      <div class="car-wrap">
+        <div class="car-prompt" id="car-prompt">${allRead?`That is all ${cards.length}. Continue is unlocked.`:`Tap the arrows to read all ${cards.length}. Continue unlocks when you have.`}</div>
+        <div class="car-frame"><div class="car-card">${body}</div></div>
+        <div class="car-nav">
+          <div class="car-dots">${dots}</div>
+          <div class="car-count">${pos+1} / ${cards.length}</div>
+          <div class="car-btns">
+            <button class="car-btn" id="car-prev" ${pos===0?"disabled":""}>&larr;</button>
+            <button class="car-btn" id="car-next" ${pos===cards.length-1?"disabled":""}>&rarr;</button>
+          </div>
+        </div>
+      </div>
+      ${ktStrip(item.terms)}
+    </div>`;
+  nextBtn.disabled = !allRead;
+  const setPos=(p)=>{ state.interState[state.idx]={pos:p}; renderCarousel(item); };
+  const pv=document.getElementById("car-prev"), nx=document.getElementById("car-next");
+  if(pv) pv.addEventListener("click",()=>setPos(Math.max(0,pos-1)));
+  if(nx) nx.addEventListener("click",()=>setPos(Math.min(cards.length-1,pos+1)));
+}
+
+// ============ STAT STRIP ============
+function renderStat(item){
+  const stats = item.stats.map(s=>`<div class="stat"><div class="stat-num">${esc(s.num)}</div><div class="stat-label">${esc(s.label)}</div></div>`).join("");
+  stage.innerHTML = `
+    <div class="card">
+      ${item.tag?`<div class="stage-tag">${esc(item.tag)}</div>`:""}
+      ${item.heading?`<h2>${esc(item.heading)}</h2>`:""}
+      ${item.lead?`<p>${item.lead}</p>`:""}
+      <div class="stat-strip">${stats}</div>
+      ${ktStrip(item.terms)}
+    </div>`;
+}
+
+
+// Reopen strip: shown on a question that follows a source, so the learner
+// never has to tap Back to reread the extract.
+//
+// v2.1. Was: the strip offered LAST_SOURCE only. That is correct for a lesson
+// built on one source and wrong for a capstone, where the paragraph question
+// asks for all of them and a learner on the closing screens could reach only
+// the most recent. Now every source seen so far in the file is reachable: a row
+// of tabs, and a swipeable track underneath. One source renders exactly as
+// before, so nothing in the existing corpus changes.
+function sourcePeek(item){
+  if(item.noSource) return "";
+  if(item.sourceRef && item.sourceRef.body){
+    return peekShell([item.sourceRef]);
+  }
+  const seen = SOURCES_SEEN.filter(s => s && s.body);
+  if(!seen.length) return "";
+  return peekShell(seen);
+}
+
+function peekShell(list){
+  const many = list.length > 1;
+  const cue = many
+    ? `Tap to read the ${list.length} sources again`
+    : `Tap to read ${esc(list[0].label)} again`;
+  const who = many
+    ? list.map(s=>esc(s.label)).join(" &middot; ")
+    : esc(stripTags(list[0].attr)).slice(0,90);
+  const tabs = many
+    ? `<div class="peek-tabs" role="tablist">${list.map((s,i)=>
+        `<button class="peek-tab${i===list.length-1?" on":""}" data-peek="${i}" role="tab">${esc(s.label)}</button>`).join("")}</div>`
+    : "";
+  const track = `<div class="peek-track" data-peek-track>${list.map(s=>
+      `<div class="peek-slide"><div class="peek-attr">${s.attr}</div>${s.body}</div>`).join("")}</div>`;
+  return `<details class="srcpeek${many?" multi":""}"><summary>
+      <svg class="chev" width="11" height="13" viewBox="0 0 11 13" fill="none" aria-hidden="true"><path d="M2 1.5 L8.5 6.5 L2 11.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="peek-cue">${cue}<span class="peek-who">${who}</span></span>
+    </summary><div class="peek-body">${tabs}${track}</div></details>`;
+}
+
+// Tabs scroll the track; swiping the track updates the tabs. Both work alone,
+// so a learner who never notices the tabs can still swipe, and the other way round.
+function bindPeek(){
+  stage.querySelectorAll(".srcpeek.multi").forEach(d=>{
+    const track = d.querySelector("[data-peek-track]");
+    const tabs  = Array.from(d.querySelectorAll(".peek-tab"));
+    if(!track || !tabs.length) return;
+    const go = i => track.scrollTo({ left: i * track.clientWidth, behavior: "smooth" });
+    tabs.forEach(t => t.addEventListener("click", () => go(parseInt(t.dataset.peek,10))));
+    let tick = null;
+    track.addEventListener("scroll", () => {
+      clearTimeout(tick);
+      tick = setTimeout(() => {
+        const i = Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
+        tabs.forEach((t,n) => t.classList.toggle("on", n === i));
+      }, 60);
+    });
+    // open on the source the learner saw last, which is the one they were reading
+    d.addEventListener("toggle", () => {
+      if(d.open) requestAnimationFrame(() => { track.scrollLeft = (tabs.length-1) * track.clientWidth; });
+    });
+  });
+}
+function stripTags(h){ return String(h||"").replace(/<[^>]+>/g,""); }
+
+// ============ SOURCE ============
+// Every source rendered so far, in order, so any later question can reopen all
+// of them. LAST_SOURCE is kept as the final entry for anything still reading it.
+let SOURCES_SEEN = [];
+let LAST_SOURCE = null;
+
+function renderSource(item){
+  const s=item.source;
+  LAST_SOURCE = { label: item.sourceLabel || item.tag || "the source", attr: s.attr, body: s.body };
+  if(!SOURCES_SEEN.some(x => x.label === LAST_SOURCE.label)) SOURCES_SEEN.push(LAST_SOURCE);
+  stage.innerHTML = `
+    <div class="card">
+      ${item.tag?`<div class="stage-tag">${esc(item.tag)}</div>`:""}
+      ${item.html||""}
+      <div class="source">
+        <div class="source-attr">${s.attr}</div>
+        <div class="source-body">${s.body}</div>
+        ${s.toggle?`<button class="toggle-btn" data-toggle>${s.toggleLabel||"What does this actually mean?"}</button><div class="toggle-body">${s.toggle}</div>`:""}
+      </div>
+      ${ktStrip(item.terms)}
+    </div>`;
+  bindToggles();
+}
+
+// ============ QUESTION (mcq / order / sort) ============
+function renderQuestion(item){
+  if(item.mode==="order") return renderOrder(item);
+  if(item.mode==="sort") return renderSort(item);
+  return renderMCQ(item);
+}
+
+function renderMCQ(item){
+  const answered = state.revealed[state.idx];
+  if(!state.order[state.idx]){
+    const a=item.options.map((_,i)=>i);
+    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+    state.order[state.idx]=a;
+  }
+  const order=state.order[state.idx];
+  const chip = item.level ? `<span class="chip ${chipCls(item.level)}">${item.level}</span>` : `<span class="chip chip-instinct">Instinct</span>`;
+  let opts="";
+  order.forEach((orig,pos)=>{
+    let cls="option", mark="";
+    if(answered){
+      if(orig===item.correct){ cls+=" correct"; mark=`<span class="opt-mark">&#10003;</span>`; }
+      else if(orig===state.answers[state.idx]){ cls+=" wrong"; mark=`<span class="opt-mark">&#10007;</span>`; }
+      else cls+=" dimmed";
+    } else if(state.answers[state.idx]===orig){ cls+=" selected"; }
+    opts+=`<button class="${cls}" data-orig="${orig}" ${answered?"disabled":""}><span class="opt-letter">${String.fromCharCode(65+pos)}</span><span class="opt-text">${item.options[orig]}</span>${mark}</button>`;
+  });
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta">${chip}${item.marks?`<span class="marks">${esc(item.marks)}</span>`:""}</div>
+      ${sourcePeek(item)}
+      <div class="q-text">${item.q}</div>
+      <div class="options">${opts}</div>
+      ${answered?`<div class="explanation"><div class="expl-label">Why</div><div class="expl-text">${resolveOpts(item.explanation, order)}</div></div>`:""}
+    </div>`;
+  if(!answered){
+    stage.querySelectorAll(".option").forEach(b=>b.addEventListener("click",()=>{
+      state.answers[state.idx]=parseInt(b.dataset.orig,10);
+      state.revealed[state.idx]=true;
+      render();
+    }));
+  }
+  syncNav(true);
+}
+
+// order: tap to place into a numbered list, tap placed to remove; Check when all placed
+function renderOrder(item){
+  const answered = state.revealed[state.idx];
+  const st = state.interState[state.idx] || (state.interState[state.idx]={placed:[]});
+  const placed = st.placed;                       // array of content indices in chosen order
+  const remaining = item.items.map((_,i)=>i).filter(i=>!placed.includes(i));
+  let placedHtml = placed.map((ci,pos)=>{
+    let cls="inter-item inter-placed";
+    if(answered){ cls = "inter-item "+(ci===item.answer[pos]?"ok":"no"); }
+    return `<button class="${cls}" data-placed="${ci}" ${answered?"disabled":""}><span class="rank">${pos+1}</span><span>${esc(item.items[ci])}</span></button>`;
+  }).join("");
+  let poolHtml = remaining.map(ci=>`<button class="inter-item" data-pool="${ci}"><span class="rank">&bull;</span><span>${esc(item.items[ci])}</span></button>`).join("");
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="chip ${item.level?chipCls(item.level):"chip-instinct"}">${item.level||"Instinct"}</span>${item.marks?`<span class="marks">${esc(item.marks)}</span>`:""}</div>
+      ${sourcePeek(item)}
+      <div class="q-text">${item.q}</div>
+      <div class="inter">
+        <div class="inter-pool" id="placed">${placedHtml||`<div style="color:var(--fade);font-size:0.9rem;padding:0.4rem 0;">Tap an event below to start putting them in order.</div>`}</div>
+        ${remaining.length?`<div style="height:1px;background:rgba(27,42,51,0.14);margin:0.9rem 0;"></div><div class="inter-pool" id="pool">${poolHtml}</div>`:""}
+      </div>
+      ${answered?`<div class="explanation"><div class="expl-label">Why</div><div class="expl-text">${resolveOpts(item.explanation,null)}</div></div>`:""}
+    </div>`;
+  if(!answered){
+    stage.querySelectorAll("[data-pool]").forEach(b=>b.addEventListener("click",()=>{ placed.push(parseInt(b.dataset.pool,10)); renderOrder(item); }));
+    stage.querySelectorAll("[data-placed]").forEach(b=>b.addEventListener("click",()=>{ const ci=parseInt(b.dataset.placed,10); st.placed=placed.filter(x=>x!==ci); renderOrder(item); }));
+  }
+  const allPlaced = placed.length===item.items.length;
+  syncNavInteractive(allPlaced, answered, ()=>{
+    state.answers[state.idx]=placed.slice();
+    state.revealed[state.idx]=true; render();
+  });
+}
+
+// sort: two columns, tap an item's column button to place, tap placed to remove
+function renderSort(item){
+  const answered = state.revealed[state.idx];
+  const st = state.interState[state.idx] || (state.interState[state.idx]={col:{}});
+  const col = st.col;                              // content index -> 0/1
+  const unplaced = item.items.map((_,i)=>i).filter(i=>!(i in col));
+  const colCards = (which)=>item.items.map((it,ci)=>{
+    if(col[ci]!==which) return "";
+    let cls="inter-item inter-placed";
+    if(answered) cls="inter-item "+(item.answer[ci]===which?"ok":"no");
+    return `<button class="${cls}" data-un="${ci}" ${answered?"disabled":""}><span>${esc(it)}</span></button>`;
+  }).join("");
+  const pool = unplaced.map(ci=>`
+    <div class="inter-item" style="flex-direction:column;align-items:stretch;cursor:default;">
+      <span>${esc(item.items[ci])}</span>
+      <div class="sort-btns">
+        <button class="sort-place" data-place="${ci}" data-col="0">${esc(item.cols[0])}</button>
+        <button class="sort-place" data-place="${ci}" data-col="1">${esc(item.cols[1])}</button>
+      </div>
+    </div>`).join("");
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="chip ${item.level?chipCls(item.level):"chip-instinct"}">${item.level||"Instinct"}</span>${item.marks?`<span class="marks">${esc(item.marks)}</span>`:""}</div>
+      ${sourcePeek(item)}
+      <div class="q-text">${item.q}</div>
+      <div class="inter">
+        <div class="sort-cols">
+          <div class="sort-col"><h4>${esc(item.cols[0])}</h4>${colCards(0)}</div>
+          <div class="sort-col"><h4>${esc(item.cols[1])}</h4>${colCards(1)}</div>
+        </div>
+        ${unplaced.length?`<div style="height:1px;background:rgba(27,42,51,0.14);margin:0.9rem 0;"></div><div class="inter-pool">${pool}</div>`:""}
+      </div>
+      ${answered?`<div class="explanation"><div class="expl-label">Why</div><div class="expl-text">${resolveOpts(item.explanation,null)}</div></div>`:""}
+    </div>`;
+  if(!answered){
+    stage.querySelectorAll("[data-place]").forEach(b=>b.addEventListener("click",()=>{ col[parseInt(b.dataset.place,10)]=parseInt(b.dataset.col,10); renderSort(item); }));
+    stage.querySelectorAll("[data-un]").forEach(b=>b.addEventListener("click",()=>{ delete col[parseInt(b.dataset.un,10)]; renderSort(item); }));
+  }
+  const allPlaced = unplaced.length===0;
+  syncNavInteractive(allPlaced, answered, ()=>{
+    state.answers[state.idx]=Object.assign({},col);
+    state.revealed[state.idx]=true; render();
+  });
+}
+
+// ============ RUNNING SUMMARY (own screen) ============
+function renderRunsum(item){
+  const parts = buildIds.filter(i=>i<=state.idx && state.revealed[i]).map(i=>FLOW[i].part);
+  const freshIdx = parts.length-1;
+  const lis = parts.map((p,i)=>`<li class="${i===freshIdx?"fresh":""}">${esc(p)}</li>`).join("");
+  stage.innerHTML = `
+    <div class="card">
+      <div class="stage-tag">${esc(item.tag||"Your running summary")}</div>
+      ${item.heading?`<h2>${esc(item.heading)}</h2>`:""}
+      ${item.html?item.html:""}
+      <div class="runsum"><div class="runsum-label">${esc(item.label||"Your running summary")}</div><ol>${lis}</ol></div>
+      ${item.outro?`<p class="runsum-outro">${item.outro}</p>`:""}
+    </div>`;
+}
+
+// ============ POPUP after a build question ============
+function showBuildPop(part, label){
+  const back=document.createElement("div");
+  back.className="pop-back";
+  back.innerHTML=`<div class="pop"><div class="pop-label">${esc(label||"The line this lesson argues")}</div><div class="pop-text">${esc(part)}</div><button class="pop-btn" id="pop-ok">Got it</button></div>`;
+  document.body.appendChild(back);
+  document.getElementById("pop-ok").addEventListener("click",()=>back.remove());
+}
+
+// ============ NAV ============
+function syncNav(isQuestion){
+  nav.classList.remove("hidden");
+  backBtn.disabled=false;
+  backBtn.innerHTML = state.idx===0 ? "&larr; Back to the start" : "&larr; Back";
+  nextBtn.style.display="";
+  nextBtn.disabled = isQuestion ? !state.revealed[state.idx] : false;
+  nextBtn.innerHTML = state.idx===FLOW.length-1 ? "See results &rarr;" : "Continue &rarr;";
+}
+// interactive items: replace Continue with a Check button until answered
+function syncNavInteractive(canCheck, answered, onCheck){
+  nav.classList.remove("hidden");
+  backBtn.disabled=false;
+  backBtn.innerHTML = state.idx===0 ? "&larr; Back to the start" : "&larr; Back";
+  if(answered){
+    nextBtn.style.display="";
+    nextBtn.disabled=false;
+    nextBtn.innerHTML = state.idx===FLOW.length-1 ? "See results &rarr;" : "Continue &rarr;";
+    nextBtn.onclick = defaultNext;
+  } else {
+    nextBtn.style.display="";
+    nextBtn.disabled=!canCheck;
+    nextBtn.innerHTML="Check &rarr;";
+    nextBtn.onclick = ()=>{ onCheck(); };
+  }
+}
+
+function defaultNext(){
+  // fire the running-summary popup when leaving a build question
+  const cur=FLOW[state.idx];
+  if(cur && cur.build && state.revealed[state.idx] && !state.poppedBuild[state.idx]){
+    state.poppedBuild[state.idx]=true;
+    showBuildPop(cur.part, cur.buildLabel);
+  }
+  if(state.idx<FLOW.length-1){ state.idx++; render(); } else showResults();
+}
+
+nextBtn.onclick = defaultNext;
+backBtn.addEventListener("click",()=>{
+  if(state.idx<=0){ state.idx=-1; renderCover(); }
+  else { state.idx--; render(); }
+});
+
+// ============ RENDER DISPATCH ============
+function render(){
+  window.scrollTo({top:0,behavior:"instant"});
+  if(state.idx===-1){ renderCover(); return; }
+  topBar.classList.remove("hidden");
+  document.getElementById("step-count").textContent=`Step ${state.idx+1} of ${FLOW.length}`;
+  document.getElementById("fill").style.width=((state.idx+1)/FLOW.length*100)+"%";
+  const item=FLOW[state.idx];
+  nextBtn.onclick = defaultNext;
+  switch(item.type){
+    case "story": renderStory(item); syncNav(false); break;
+    case "carousel": renderCarousel(item); /* nav handled inside */ syncNavCarousel(); break;
+    case "stat": renderStat(item); syncNav(false); break;
+    case "source": renderSource(item); syncNav(false); break;
+    case "question": renderQuestion(item); break;
+    case "runsum": renderRunsum(item); syncNav(false); break;
+    default: renderContent(item); syncNav(false);
+  }
+}
+function syncNavCarousel(){
+  nav.classList.remove("hidden");
+  backBtn.disabled=false;
+  backBtn.innerHTML = state.idx===0 ? "&larr; Back to the start" : "&larr; Back";
+  nextBtn.style.display="";
+  nextBtn.innerHTML = state.idx===FLOW.length-1 ? "See results &rarr;" : "Continue &rarr;";
+  // disabled state already set inside renderCarousel
+}
+
+function bindToggles(){
+  bindPeek();
+  stage.querySelectorAll("[data-toggle]").forEach(b=>b.addEventListener("click",()=>{
+    b.nextElementSibling.classList.toggle("open");
+  }));
+}
+
+// ============ RESULTS ============
+function showResults(){
+  topBar.classList.add("hidden");
+  nav.classList.add("hidden");
+  let correct=0;
+  assessedIds.forEach(i=>{ if(isRight(i)) correct++; });
+  const total=assessedIds.length;
+  const pct = total?Math.round(correct/total*100):0;
+  let band="", desc="";
+  if(pct>=85){ band="Excellent"; desc=RESULTS.bands.excellent; }
+  else if(pct>=70){ band="Strong"; desc=RESULTS.bands.strong; }
+  else if(pct>=55){ band="Solid"; desc=RESULTS.bands.solid; }
+  else if(pct>=40){ band="Patchy"; desc=RESULTS.bands.patchy; }
+  else { band="Start again"; desc=RESULTS.bands.start; }
+  const rows=spine().map(sp=>{
+    const ids=assessedIds.filter(i=>FLOW[i].level===sp);
+    if(!ids.length) return "";
+    const g=ids.filter(i=>isRight(i)).length;
+    const p=Math.round(g/ids.length*100);
+    return `<div class="bd-row"><div class="bd-name">${sp}</div><div class="bd-bar"><div class="bd-fill" style="width:${p}%"></div></div><div class="bd-score">${g}/${ids.length}</div></div>`;
+  }).join("");
+  const parts=buildIds.filter(i=>state.revealed[i]).map(i=>FLOW[i].part);
+  const runsum = parts.length?`<div class="breakdown"><div class="breakdown-label">Your running summary</div><ol style="margin:0;padding-left:1.3rem;">${parts.map(p=>`<li style="font-size:0.98rem;line-height:1.62;margin-bottom:0.6rem;">${esc(p)}</li>`).join("")}</ol></div>`:"";
+  stage.innerHTML = `
+    <div class="results-head">
+      <div class="results-eyebrow">${RESULTS.eyebrow||"Lesson report"}</div>
+      <h1 class="results-title">${esc(RESULTS.title||"Where you stand")}</h1>
+    </div>
+    <div class="score-row">
+      <div class="score-block"><div class="score-num">${correct}<span class="score-den">/${total}</span></div><div class="score-label">Correct</div></div>
+      <div class="score-block"><div class="score-num">${pct}<span class="score-den">%</span></div><div class="score-label">Accuracy</div></div>
+      <div class="score-block"><div class="score-word">${band}</div><div class="score-label">Band</div></div>
+    </div>
+    <div class="grade-desc">${desc}</div>
+    <div class="breakdown"><div class="breakdown-label">By skill</div>${rows}</div>
+    ${runsum}
+    <div class="results-actions">
+      <button class="btn-secondary" id="restart-btn">Restart lesson</button>
+      <button class="btn-primary" id="finish-btn">Finish &rarr;</button>
+    </div>
+    ${RESULTS.footer?`<div style="text-align:center;margin-top:1.1rem;font-size:0.92rem;color:var(--fade);">${esc(RESULTS.footer)}</div>`:""}`;
+  document.getElementById("restart-btn").addEventListener("click",()=>{
+    state.idx=-1; state.answers={}; state.revealed={}; state.order={}; state.carRead={}; state.interState={}; state.poppedBuild={};
+    renderCover();
+  });
+  document.getElementById("finish-btn").addEventListener("click",()=>{
+    const back=document.createElement("div");
+    back.className="pop-back";
+    const D = RESULTS.done||{};
+    back.innerHTML=`<div class="pop"><div class="pop-label">${esc(D.label||"Lesson complete")}</div>${D.title?`<h3 style="margin:.4rem 0 .2rem;font-size:1.05rem;">${esc(D.title)}</h3>`:""}<div class="pop-text">${esc(D.text||"Tap Done to continue to the next lesson.")}</div><button class="pop-btn" id="fin-ok">Done</button></div>`;
+    document.body.appendChild(back);
+    document.getElementById("fin-ok").addEventListener("click",()=>back.remove());
+  });
+}
+
+function isRight(i){
+  const item=FLOW[i]; const ans=state.answers[i];
+  if(ans===undefined) return false;
+  if(item.mode==="order") return JSON.stringify(ans)===JSON.stringify(item.answer);
+  if(item.mode==="sort"){ return item.items.every((_,ci)=>ans[ci]===item.answer[ci]); }
+  return ans===item.correct;
+}
+
+renderCover();
+})();
+
+
+/* ---- MODE TOGGLE ---------------------------------------------------------
+   Injects its own button so there is no stray markup, and lives inside the
+   single script block so a first-to-last script extraction still parses. */
+(function(){
+  var NATIVE = "light";
+  try{ if(localStorage.getItem("kula-mode")==="alt"){ document.body.classList.add("alt"); } }catch(e){}
+  var SUN='<circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/>';
+  var MOON='<path d="M20.5 14.6A8.6 8.6 0 0 1 9.4 3.5a8.6 8.6 0 1 0 11.1 11.1z"/>';
+  var b=document.getElementById("mode-toggle");
+  if(!b){
+    b=document.createElement("button");
+    b.className="mode-toggle"; b.id="mode-toggle"; b.type="button";
+    b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" id="mode-icon"></svg><span id="mode-label"></span>';
+    document.body.appendChild(b);
+  }
+  var lab=document.getElementById("mode-label"), ic=document.getElementById("mode-icon");
+  function paint(){
+    var onAlt=document.body.classList.contains("alt");
+    var showing = onAlt ? (NATIVE==="dark" ? "light" : "dark") : NATIVE;
+    var offering = showing==="dark" ? "light" : "dark";
+    lab.textContent = offering==="light" ? "Light Mode" : "Dark Mode";
+    ic.innerHTML = offering==="light" ? SUN : MOON;
+    b.setAttribute("aria-pressed", onAlt ? "true" : "false");
+    b.setAttribute("aria-label", "Switch to " + offering + " mode");
+  }
+  b.addEventListener("click",function(){
+    var onAlt=document.body.classList.toggle("alt");
+    try{ localStorage.setItem("kula-mode", onAlt ? "alt" : "native"); }catch(e){}
+    paint();
+  });
+  paint();
+
+})();
+</script>
+</body>
+</html>
